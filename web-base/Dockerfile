@@ -30,6 +30,7 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         opcache \
         apcu \
         gd \
+        redis \
         xdebug
 
 RUN mkdir -p /etc/apt/keyrings
