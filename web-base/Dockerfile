@@ -30,6 +30,7 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         opcache \
         apcu \
         gd \
+        imagick \
         redis \
         xdebug
 
