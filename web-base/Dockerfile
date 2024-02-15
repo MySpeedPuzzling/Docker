@@ -42,7 +42,8 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesourc
 
 RUN apt-get update && apt-get install nodejs -y
 
-ENV COMPOSER_MEMORY_LIMIT=-1 \
+ENV COMPOSER_ALLOW_SUPERUSER=1 \
+    COMPOSER_MEMORY_LIMIT=-1 \
     COMPOSER_HOME="/.composer" \
     PHP_OPCACHE_VALIDATE_TIMESTAMPS=1 \
     PHP_OPCACHE_MAX_ACCELERATED_FILES=15000 \
