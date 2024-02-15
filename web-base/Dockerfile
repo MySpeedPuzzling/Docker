@@ -31,6 +31,7 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         apcu \
         gd \
         imagick \
+        exif \
         redis \
         xdebug
 
