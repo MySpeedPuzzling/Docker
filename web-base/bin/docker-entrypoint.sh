@@ -52,9 +52,30 @@ if [ "$1" = "unitd" -o "$1" = "unitd-debug" ]; then
         done
 
         echo "$0: Stopping Unit daemon after initial configuration..."
-        kill -TERM $(/bin/cat /var/run/unit.pid)
+        /bin/cat /var/run/unit.pid
+        kill -TERM `/bin/cat /var/run/unit.pid`
 
-        while [ -S /var/run/control.unit.sock ]; do echo "$0: Waiting for control socket to be removed..."; /bin/sleep 0.1; done
+        # First try gracefully stop - 10 seconds to wait for graceful shutdown
+        timeout=10
+        while [ -S /var/run/control.unit.sock ]; do
+            echo "$0: Waiting for control socket to be removed..."
+            /bin/sleep 1
+            timeout=$((timeout - 1))
+            if [ $timeout -le 0 ]; then
+                echo "Graceful shutdown failed, proceeding with forceful termination..."
+                break
+            fi
+        done
+
+        if [ -S /var/run/control.unit.sock ]; then
+            kill -KILL `/bin/cat /var/run/unit.pid`
+            /bin/sleep 2 # Short delay to allow process termination
+        fi
+
+        if [ -S /var/run/control.unit.sock ]; then
+            echo "Error: Control socket still exists after forceful termination"
+            exit 1
+        fi
 
         echo
         echo "$0: Unit initial configuration complete; ready for start up..."
