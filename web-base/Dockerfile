@@ -23,19 +23,19 @@ RUN mkdir /docker-entrypoint.d/ \
         nano \
         libmagickwand-dev \
     && install-php-extensions \
-       @composer \
-       	bcmath \
-       intl \
-       pcntl \
-       zip \
-       uuid \
-       pdo_pgsql \
-       opcache \
-       apcu \
-       gd \
-       exif \
-       redis \
-       xdebug \
+        @composer \
+        bcmath \
+        intl \
+        pcntl \
+        zip \
+        uuid \
+        pdo_pgsql \
+        opcache \
+        apcu \
+        gd \
+        exif \
+        redis \
+        xdebug \
   && curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
   && apt-get install -y nodejs \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -51,11 +51,11 @@ RUN git clone https://github.com/Imagick/imagick.git --depth 1 /tmp/imagick \
     && docker-php-ext-enable imagick
 
 COPY php.ini $PHP_INI_DIR/php.ini
-COPY bin/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY bin/docker-entrypoint.sh /usr/local/bin/docker-php-entrypoint
 COPY bin/wait-for-it.sh /usr/local/bin/wait-for-it
 
 RUN chmod +x /usr/local/bin/wait-for-it \
-    && chmod +x /usr/local/bin/docker-entrypoint.sh
+    && chmod +x /usr/local/bin/docker-php-entrypoint
 
 WORKDIR /app
 
