@@ -26,6 +26,9 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         curl \
         lsb-release \
         gnupg \
+        wget \
+        nano \
+        libmagickwand-dev \
     && install-php-extensions \
         @composer \
         bcmath \
@@ -37,13 +40,9 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         opcache \
         apcu \
         gd \
-        imagick \
         exif \
         redis \
         xdebug \
-        wget \
-        nano \
-        libmagickwand-dev \
     && curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
