@@ -43,6 +43,7 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         exif \
         redis \
         xdebug \
+        excimer \
     && curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
