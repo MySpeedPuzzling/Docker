@@ -58,5 +58,3 @@ RUN chmod +x /usr/local/bin/wait-for-it \
     && chmod +x /usr/local/bin/docker-php-entrypoint
 
 WORKDIR /app
-
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
