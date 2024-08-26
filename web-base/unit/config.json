@@ -35,8 +35,8 @@
                 }
             },
             "processes": {
-                "max": 15,
-                "spare": 5,
+                "max": 30,
+                "spare": 15,
                 "idle_timeout": 30
             },
             "options": {
