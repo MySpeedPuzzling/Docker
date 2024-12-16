@@ -41,7 +41,7 @@
             },
             "options": {
                 "user": {
-                    "memory_limit": "256M"
+                    "memory_limit": "512M"
                 },
                 "admin": {}
             }
