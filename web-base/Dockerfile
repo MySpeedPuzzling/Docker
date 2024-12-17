@@ -20,6 +20,8 @@ RUN chmod +x /usr/local/bin/wait-for-it \
     && mkdir /.composer \
     && mkdir /usr/tmp \
     && apt-get update && apt-get install -y \
+        build-essential \
+        cmake \
         git \
         zip \
         ca-certificates \
@@ -30,6 +32,22 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         nano \
         libmagickwand-dev \
         wkhtmltopdf \
+        libde265-dev \
+        libx265-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libwebp-dev \
+        pkg-config \
+    && apt-get remove -y libheif1 \
+    && cd /usr/local/src && \
+        git clone --branch v1.19.5 https://github.com/strukturag/libheif.git && \
+        cd libheif && \
+        mkdir build && \
+        cd build && \
+        cmake .. && \
+        make && make install && \
+        ldconfig && \
+        rm -rf /usr/local/src/libheif \
     && install-php-extensions \
         @composer \
         bcmath \
@@ -46,17 +64,10 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         xdebug \
         excimer \
         xsl \
+        imagick \
     && curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* \
-    && git clone https://github.com/Imagick/imagick.git --depth 1 /tmp/imagick \
-        && cd /tmp/imagick \
-        && phpize \
-        && ./configure \
-        && make \
-        && make install \
-        && rm -rf /tmp/imagick \
-        && docker-php-ext-enable imagick
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
