@@ -30,10 +30,12 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         gnupg \
         wget \
         nano \
-        libmagickwand-dev \
         wkhtmltopdf \
+        libmagickwand-dev \
         libde265-dev \
         libx265-dev \
+        libaom-dev \
+        libdav1d-dev \
         libjpeg-dev \
         libpng-dev \
         libwebp-dev \
@@ -44,7 +46,7 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         cd libheif && \
         mkdir build && \
         cd build && \
-        cmake .. && \
+        cmake -DENABLE_AVIF=ON .. && \
         make && make install && \
         ldconfig && \
         rm -rf /usr/local/src/libheif \
