@@ -74,6 +74,7 @@ RUN chmod +x /usr/local/bin/wait-for-it \
     && apt-get install -y nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+
 WORKDIR /app
 
 COPY php.ini /usr/local/etc/php/conf.d/99-php-overrides.ini
