@@ -40,6 +40,8 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         libpng-dev \
         libwebp-dev \
         pkg-config \
+        librsvg2-bin \
+        imagemagick \
     && apt-get remove -y libheif1 \
     && cd /usr/local/src && \
         git clone --branch v1.19.5 https://github.com/strukturag/libheif.git && \
