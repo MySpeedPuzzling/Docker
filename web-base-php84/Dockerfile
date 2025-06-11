@@ -41,9 +41,8 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         libwebp-dev \
         pkg-config \
         librsvg2-bin \
+        inkscape \
     && apt-get remove -y libheif1 \
-    && apt-get install -y imagemagick-6.q16 \
-      && update-alternatives --install /usr/bin/convert convert /usr/bin/convert-im6.q16 60 \
     && cd /usr/local/src && \
         git clone --branch v1.19.5 https://github.com/strukturag/libheif.git && \
         cd libheif && \
