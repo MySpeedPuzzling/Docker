@@ -41,8 +41,9 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         libwebp-dev \
         pkg-config \
         librsvg2-bin \
-        inkscape \
     && apt-get remove -y libheif1 \
+    && apt-get update && apt-get install -y \
+        inkscape \
     && cd /usr/local/src && \
         git clone --branch v1.19.5 https://github.com/strukturag/libheif.git && \
         cd libheif && \
