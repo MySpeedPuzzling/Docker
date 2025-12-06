@@ -68,10 +68,18 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         gd \
         exif \
         redis \
-        xdebug \
         excimer \
         xsl \
         imagick \
+    # Install xdebug from source (PECL metadata outdated for PHP 8.5)
+    && cd /usr/local/src && \
+        git clone --branch 3.5.0 https://github.com/xdebug/xdebug.git && \
+        cd xdebug && \
+        phpize && \
+        ./configure --enable-xdebug && \
+        make && make install && \
+        docker-php-ext-enable xdebug && \
+        rm -rf /usr/local/src/xdebug \
     && curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
