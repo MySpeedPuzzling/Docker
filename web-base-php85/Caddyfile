@@ -1,0 +1,33 @@
+{
+    # Disable automatic HTTPS (we're behind a reverse proxy)
+    auto_https off
+
+    # Global Caddy runtime logs (startup, errors, internal events)
+    log {
+        output stdout
+        format console
+    }
+
+    # Server configuration
+    servers {
+        # Allow large request bodies (128MB like NGINX Unit)
+        max_header_size 128kb
+    }
+}
+
+:8080 {
+    root * /app/public
+
+    # Access logging for this site
+    log {
+        output stdout
+        format console
+    }
+
+    # Encode responses with gzip/zstd
+    encode zstd gzip
+
+    # PHP handling (non-worker mode)
+    # Serves static files if they exist, falls back to PHP
+    php_server
+}
