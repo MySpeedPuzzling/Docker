@@ -11,7 +11,6 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
 
 COPY bin/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY bin/wait-for-it.sh /usr/local/bin/wait-for-it
-COPY Caddyfile /etc/caddy/Caddyfile
 
 # Very convenient PHP extensions installer: https://github.com/mlocati/docker-php-extension-installer
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
@@ -83,6 +82,8 @@ RUN chmod +x /usr/local/bin/wait-for-it \
     && curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY Caddyfile /etc/caddy/Caddyfile
 
 WORKDIR /app
 
