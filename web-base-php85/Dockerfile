@@ -13,9 +13,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
     FRANKENPHP_WORKER_NUM="" \
     FRANKENPHP_WATCH="" \
     FRANKENPHP_WATCH_PATHS="./src/**/*.php ./config/**/*.{yaml,yml} ./templates/**/*.twig" \
-    FRANKENPHP_CONFIG="" \
-    MERCURE_PUBLISHER_JWT_KEY="" \
-    MERCURE_SUBSCRIBER_JWT_KEY=""
+    FRANKENPHP_CONFIG=""
 
 COPY bin/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY bin/wait-for-it.sh /usr/local/bin/wait-for-it
