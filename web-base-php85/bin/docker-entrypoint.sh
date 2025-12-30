@@ -30,4 +30,27 @@ else
     echo "$0: /docker-entrypoint.d/ is empty, skipping initialization..."
 fi
 
+# Construct FRANKENPHP_CONFIG from helper environment variables
+# Only if FRANKENPHP_CONFIG is not already set directly
+if [ -z "${FRANKENPHP_CONFIG}" ] && [ "${FRANKENPHP_WORKER}" = "1" ]; then
+    WORKER_FILE="${FRANKENPHP_WORKER_FILE:-/app/public/index.php}"
+    CONFIG="worker { file ${WORKER_FILE}"
+
+    if [ -n "${FRANKENPHP_WORKER_NUM}" ]; then
+        CONFIG="${CONFIG} num ${FRANKENPHP_WORKER_NUM}"
+    fi
+
+    if [ "${FRANKENPHP_WATCH}" = "1" ]; then
+        WATCH_PATHS="${FRANKENPHP_WATCH_PATHS:-./src/**/*.php ./config/**/*.{yaml,yml} ./templates/**/*.twig}"
+        # Add each watch path separately
+        for path in ${WATCH_PATHS}; do
+            CONFIG="${CONFIG} watch ${path}"
+        done
+    fi
+
+    CONFIG="${CONFIG} }"
+    export FRANKENPHP_CONFIG="${CONFIG}"
+    echo "$0: Worker mode enabled: ${CONFIG}"
+fi
+
 exec "$@"

@@ -10,18 +10,42 @@
 
     # Server configuration
     servers {
-        # Allow large request bodies (128MB like NGINX Unit)
+        # Allow large request headers (128KB)
         max_header_size 128kb
+
+        # Enable full-duplex for HTTP/1.1 connections
+        # Required for SSE, streaming responses, Mercure, etc.
+        enable_full_duplex
     }
+
+    # FrankenPHP worker configuration (injected via FRANKENPHP_CONFIG env var)
+    # Example: FRANKENPHP_CONFIG="worker { file /app/public/index.php num 4 }"
+    frankenphp {
+        {$FRANKENPHP_CONFIG}
+    }
+
+    # Additional global options can be injected via CADDY_GLOBAL_OPTIONS
+    {$CADDY_GLOBAL_OPTIONS}
 }
+
+# Import user-provided Caddyfile snippets (optional)
+import /etc/frankenphp/Caddyfile.d/*.caddyfile
 
 :8080 {
     root * /app/public
 
-    # Encode responses with gzip/zstd
+    # Encode responses with zstd/gzip
     encode zstd gzip
 
-    # PHP handling (non-worker mode)
-    # Serves static files if they exist, falls back to PHP
+    # Mercure hub (real-time messaging)
+    # Set MERCURE_PUBLISHER_JWT_KEY and MERCURE_SUBSCRIBER_JWT_KEY to enable
+    mercure {
+        publisher_jwt {$MERCURE_PUBLISHER_JWT_KEY}
+        subscriber_jwt {$MERCURE_SUBSCRIBER_JWT_KEY}
+    }
+
+    # PHP handling
+    # In non-worker mode: serves static files, falls back to PHP
+    # In worker mode: worker config is applied globally via frankenphp block
     php_server
 }

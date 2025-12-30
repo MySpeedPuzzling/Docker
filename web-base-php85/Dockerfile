@@ -7,7 +7,15 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
     PHP_OPCACHE_MAX_ACCELERATED_FILES=15000 \
     PHP_OPCACHE_MEMORY_CONSUMPTION=192 \
     PHP_OPCACHE_MAX_WASTED_PERCENTAGE=10 \
-    SERVER_NAME=:8080
+    SERVER_NAME=:8080 \
+    FRANKENPHP_WORKER="" \
+    FRANKENPHP_WORKER_FILE="/app/public/index.php" \
+    FRANKENPHP_WORKER_NUM="" \
+    FRANKENPHP_WATCH="" \
+    FRANKENPHP_WATCH_PATHS="./src/**/*.php ./config/**/*.{yaml,yml} ./templates/**/*.twig" \
+    FRANKENPHP_CONFIG="" \
+    MERCURE_PUBLISHER_JWT_KEY="" \
+    MERCURE_SUBSCRIBER_JWT_KEY=""
 
 COPY bin/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY bin/wait-for-it.sh /usr/local/bin/wait-for-it
@@ -20,6 +28,7 @@ RUN chmod +x /usr/local/bin/wait-for-it \
     && mkdir -p /.composer \
     && mkdir -p /usr/tmp \
     && mkdir -p /docker-entrypoint.d \
+    && mkdir -p /etc/frankenphp/Caddyfile.d \
     && apt-get update && apt-get install -y \
         build-essential \
         cmake \
@@ -70,15 +79,7 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         excimer \
         xsl \
         imagick \
-    # Install xdebug from source (PECL metadata outdated for PHP 8.5)
-    && cd /usr/local/src && \
-        git clone --branch 3.5.0 https://github.com/xdebug/xdebug.git && \
-        cd xdebug && \
-        phpize && \
-        ./configure --enable-xdebug && \
-        make && make install && \
-        docker-php-ext-enable xdebug && \
-        rm -rf /usr/local/src/xdebug \
+        xdebug \
     && curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
