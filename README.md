@@ -43,7 +43,7 @@ services:
       - ./:/app
 ```
 
-**Symfony:** `composer require runtime/frankenphp-symfony` and set `APP_RUNTIME=Runtime\FrankenPhpSymfony\Runtime`
+**Symfony:** 7.4+ has native worker mode support. For older versions: `composer require runtime/frankenphp-symfony` and set `APP_RUNTIME=Runtime\FrankenPhpSymfony\Runtime`
 
 **Extensibility:** Mount Caddyfile snippets to `/etc/frankenphp/Caddyfile.d/*.caddyfile`
 
