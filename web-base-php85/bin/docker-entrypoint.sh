@@ -34,23 +34,31 @@ fi
 # Only if FRANKENPHP_CONFIG is not already set directly
 if [ -z "${FRANKENPHP_CONFIG}" ] && [ "${FRANKENPHP_WORKER}" = "1" ]; then
     WORKER_FILE="${FRANKENPHP_WORKER_FILE:-/app/public/index.php}"
-    CONFIG="worker { file ${WORKER_FILE}"
+
+    # Build multi-line config (Caddyfile requires newlines in blocks)
+    CONFIG="worker {
+        file ${WORKER_FILE}"
 
     if [ -n "${FRANKENPHP_WORKER_NUM}" ]; then
-        CONFIG="${CONFIG} num ${FRANKENPHP_WORKER_NUM}"
+        CONFIG="${CONFIG}
+        num ${FRANKENPHP_WORKER_NUM}"
     fi
 
     if [ "${FRANKENPHP_WATCH}" = "1" ]; then
+        # Default watch patterns - disable glob expansion to preserve patterns
         WATCH_PATHS="${FRANKENPHP_WATCH_PATHS:-./src/**/*.php ./config/**/*.{yaml,yml} ./templates/**/*.twig}"
-        # Add each watch path separately
+        set -f  # Disable glob expansion
         for path in ${WATCH_PATHS}; do
-            CONFIG="${CONFIG} watch ${path}"
+            CONFIG="${CONFIG}
+        watch ${path}"
         done
+        set +f  # Re-enable glob expansion
     fi
 
-    CONFIG="${CONFIG} }"
+    CONFIG="${CONFIG}
+    }"
     export FRANKENPHP_CONFIG="${CONFIG}"
-    echo "$0: Worker mode enabled: ${CONFIG}"
+    echo "$0: Worker mode enabled"
 fi
 
 exec "$@"
