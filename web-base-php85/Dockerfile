@@ -27,6 +27,7 @@ RUN chmod +x /usr/local/bin/wait-for-it \
     && mkdir -p /usr/tmp \
     && mkdir -p /docker-entrypoint.d \
     && mkdir -p /etc/frankenphp/Caddyfile.d \
+    && mkdir -p /data \
     && apt-get update && apt-get install -y \
         build-essential \
         cmake \
