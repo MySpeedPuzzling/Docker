@@ -38,12 +38,10 @@ import /etc/frankenphp/Caddyfile.d/*.caddyfile
     encode zstd gzip
 
     # Mercure hub (real-time messaging)
-    # Set MERCURE_PUBLISHER_JWT_KEY and MERCURE_SUBSCRIBER_JWT_KEY to enable
+    # Uses in-memory transport (no persistence) to support blue-green deployments
+    # BoltDB has file locking issues with concurrent containers
     mercure {
-        # Mercure 0.17+ requires explicit transport block (transport_url is deprecated)
-        transport bolt {
-            path /data/mercure.db
-            cleanup_frequency 0.3
+        transport local {
         }
         publisher_jwt {$MERCURE_PUBLISHER_JWT_KEY}
         subscriber_jwt {$MERCURE_SUBSCRIBER_JWT_KEY}
