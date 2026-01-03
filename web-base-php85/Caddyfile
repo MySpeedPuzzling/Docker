@@ -10,6 +10,10 @@
 
     # Server configuration
     servers {
+        # Trust private IP ranges for X-Forwarded-* headers (Traefik, etc.)
+        # Required for proper HTTPS detection behind reverse proxies
+        trusted_proxies static private_ranges
+
         # Allow large request headers (128KB)
         max_header_size 128kb
 
