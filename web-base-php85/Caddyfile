@@ -18,7 +18,7 @@
         max_header_size 128kb
 
         # Enable full-duplex for HTTP/1.1 connections
-        # Required for SSE, streaming responses, Mercure, etc.
+        # Required for SSE, streaming responses, etc.
         enable_full_duplex
     }
 
@@ -40,16 +40,6 @@ import /etc/frankenphp/Caddyfile.d/*.caddyfile
 
     # Encode responses with zstd/gzip
     encode zstd gzip
-
-    # Mercure hub (real-time messaging)
-    # Uses in-memory transport (no persistence) to support blue-green deployments
-    # BoltDB has file locking issues with concurrent containers
-    mercure {
-        transport local {
-        }
-        publisher_jwt {$MERCURE_PUBLISHER_JWT_KEY}
-        subscriber_jwt {$MERCURE_SUBSCRIBER_JWT_KEY}
-    }
 
     # PHP handling
     # In non-worker mode: serves static files, falls back to PHP
