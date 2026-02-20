@@ -84,6 +84,7 @@ RUN chmod +x /usr/local/bin/wait-for-it \
     && curl -sL https://sentry.io/get-cli/ | bash \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+COPY imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
 COPY Caddyfile /etc/caddy/Caddyfile
 
 WORKDIR /app
