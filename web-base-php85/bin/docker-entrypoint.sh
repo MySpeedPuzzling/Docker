@@ -57,6 +57,14 @@ if [ -z "${FRANKENPHP_CONFIG}" ] && [ "${FRANKENPHP_WORKER}" = "1" ]; then
 
     CONFIG="${CONFIG}
     }"
+
+    # Add max_wait_time (sibling of worker block, not child)
+    # Returns 504 if a request waits longer than this for a free worker
+    if [ -n "${FRANKENPHP_MAX_WAIT_TIME}" ]; then
+        CONFIG="${CONFIG}
+    max_wait_time ${FRANKENPHP_MAX_WAIT_TIME}"
+    fi
+
     export FRANKENPHP_CONFIG="${CONFIG}"
     echo "$0: Worker mode enabled"
 fi
