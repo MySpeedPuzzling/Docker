@@ -65,7 +65,7 @@ if [ -z "${FRANKENPHP_CONFIG}" ] && [ "${FRANKENPHP_WORKER}" = "1" ]; then
         CONFIG="${CONFIG}
     worker {
         file ${WORKER_FILE}
-        match path ${FRANKENPHP_IMAGE_WORKER_MATCH}
+        match ${FRANKENPHP_IMAGE_WORKER_MATCH}
         num ${FRANKENPHP_IMAGE_WORKER_NUM}
     }"
     fi
