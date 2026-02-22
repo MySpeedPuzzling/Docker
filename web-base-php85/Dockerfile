@@ -14,7 +14,9 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
     FRANKENPHP_WATCH="" \
     FRANKENPHP_WATCH_PATHS="./src/**/*.php ./config/**/*.{yaml,yml} ./templates/**/*.twig" \
     FRANKENPHP_CONFIG="" \
-    FRANKENPHP_MAX_WAIT_TIME=""
+    FRANKENPHP_MAX_WAIT_TIME="" \
+    FRANKENPHP_IMAGE_WORKER_NUM="" \
+    FRANKENPHP_IMAGE_WORKER_MATCH=""
 
 COPY bin/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY bin/wait-for-it.sh /usr/local/bin/wait-for-it

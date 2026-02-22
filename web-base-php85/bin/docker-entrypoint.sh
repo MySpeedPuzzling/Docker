@@ -58,6 +58,18 @@ if [ -z "${FRANKENPHP_CONFIG}" ] && [ "${FRANKENPHP_WORKER}" = "1" ]; then
     CONFIG="${CONFIG}
     }"
 
+    # Add a dedicated image worker pool if configured
+    # Requests matching FRANKENPHP_IMAGE_WORKER_MATCH go to this pool,
+    # keeping the main workers free for normal requests/healthchecks
+    if [ -n "${FRANKENPHP_IMAGE_WORKER_NUM}" ] && [ -n "${FRANKENPHP_IMAGE_WORKER_MATCH}" ]; then
+        CONFIG="${CONFIG}
+    worker {
+        file ${WORKER_FILE}
+        match path ${FRANKENPHP_IMAGE_WORKER_MATCH}
+        num ${FRANKENPHP_IMAGE_WORKER_NUM}
+    }"
+    fi
+
     # Add max_wait_time (sibling of worker block, not child)
     # Returns 504 if a request waits longer than this for a free worker
     if [ -n "${FRANKENPHP_MAX_WAIT_TIME}" ]; then
