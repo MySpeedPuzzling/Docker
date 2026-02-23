@@ -23,10 +23,10 @@ Contains:
 
 The entrypoint script constructs FrankenPHP config from environment variables:
 
-- **Single pool**: Workers go in the global `frankenphp {}` block via `FRANKENPHP_CONFIG`
-- **Split pools**: When `FRANKENPHP_IMAGE_WORKER_NUM` + `FRANKENPHP_IMAGE_WORKER_MATCH` are set, workers go in the `php_server {}` block via `PHP_SERVER_CONFIG` (required because `match` directive only works inside `php_server`)
+- Workers go in the global `frankenphp {}` block via `FRANKENPHP_CONFIG`
+- File watching is supported for development via `FRANKENPHP_WATCH`
 
-Key env vars: `FRANKENPHP_WORKER`, `FRANKENPHP_WORKER_NUM`, `FRANKENPHP_MAX_WAIT_TIME`, `FRANKENPHP_IMAGE_WORKER_NUM`, `FRANKENPHP_IMAGE_WORKER_MATCH`
+Key env vars: `FRANKENPHP_WORKER`, `FRANKENPHP_WORKER_NUM`, `FRANKENPHP_MAX_WAIT_TIME`
 
 ## Building Images Locally
 
@@ -45,7 +45,7 @@ Images are published to:
 
 ## Key Components
 
-- **FrankenPHP**: Application server on port 8080, worker mode with split pool support
+- **FrankenPHP**: Application server on port 8080, worker mode
 - **PHP Extensions**: bcmath, intl, pcntl, zip, uuid, pdo_pgsql, opcache, apcu, gd, exif, redis, xdebug, excimer, xsl, imagick
 - **libheif**: Custom build with AVIF support for image processing
 - **Node.js**: LTS version included for frontend tooling

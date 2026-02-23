@@ -35,64 +35,35 @@ fi
 if [ -z "${FRANKENPHP_CONFIG}" ] && [ "${FRANKENPHP_WORKER}" = "1" ]; then
     WORKER_FILE="${FRANKENPHP_WORKER_FILE:-/app/public/index.php}"
 
-    if [ -n "${FRANKENPHP_IMAGE_WORKER_NUM}" ] && [ -n "${FRANKENPHP_IMAGE_WORKER_MATCH}" ]; then
-        # Split worker pools: use php_server workers (match directive only works there)
-        # Image pool handles matched paths, main pool handles everything else
-        SERVER_CONFIG="worker ${WORKER_FILE} {
-            match ${FRANKENPHP_IMAGE_WORKER_MATCH}
-            num ${FRANKENPHP_IMAGE_WORKER_NUM}
-        }
-        worker ${WORKER_FILE} {
-            match *"
+    CONFIG="worker {
+        file ${WORKER_FILE}"
 
-        if [ -n "${FRANKENPHP_WORKER_NUM}" ]; then
-            SERVER_CONFIG="${SERVER_CONFIG}
-            num ${FRANKENPHP_WORKER_NUM}"
-        fi
-
-        SERVER_CONFIG="${SERVER_CONFIG}
-        }"
-
-        export PHP_SERVER_CONFIG="${SERVER_CONFIG}"
-
-        # Global config: only max_wait_time (workers are in php_server)
-        CONFIG=""
-        if [ -n "${FRANKENPHP_MAX_WAIT_TIME}" ]; then
-            CONFIG="max_wait_time ${FRANKENPHP_MAX_WAIT_TIME}"
-        fi
-        export FRANKENPHP_CONFIG="${CONFIG}"
-    else
-        # Single worker pool: use global frankenphp worker
-        CONFIG="worker {
-            file ${WORKER_FILE}"
-
-        if [ -n "${FRANKENPHP_WORKER_NUM}" ]; then
-            CONFIG="${CONFIG}
-            num ${FRANKENPHP_WORKER_NUM}"
-        fi
-
-        if [ "${FRANKENPHP_WATCH}" = "1" ]; then
-            # Default watch patterns - disable glob expansion to preserve patterns
-            WATCH_PATHS="${FRANKENPHP_WATCH_PATHS:-./src/**/*.php ./config/**/*.{yaml,yml} ./templates/**/*.twig}"
-            set -f  # Disable glob expansion
-            for path in ${WATCH_PATHS}; do
-                CONFIG="${CONFIG}
-            watch ${path}"
-            done
-            set +f  # Re-enable glob expansion
-        fi
-
+    if [ -n "${FRANKENPHP_WORKER_NUM}" ]; then
         CONFIG="${CONFIG}
-        }"
-
-        # Add max_wait_time (sibling of worker block in global frankenphp directive)
-        if [ -n "${FRANKENPHP_MAX_WAIT_TIME}" ]; then
-            CONFIG="${CONFIG}
-        max_wait_time ${FRANKENPHP_MAX_WAIT_TIME}"
-        fi
-
-        export FRANKENPHP_CONFIG="${CONFIG}"
+        num ${FRANKENPHP_WORKER_NUM}"
     fi
+
+    if [ "${FRANKENPHP_WATCH}" = "1" ]; then
+        # Default watch patterns - disable glob expansion to preserve patterns
+        WATCH_PATHS="${FRANKENPHP_WATCH_PATHS:-./src/**/*.php ./config/**/*.{yaml,yml} ./templates/**/*.twig}"
+        set -f  # Disable glob expansion
+        for path in ${WATCH_PATHS}; do
+            CONFIG="${CONFIG}
+        watch ${path}"
+        done
+        set +f  # Re-enable glob expansion
+    fi
+
+    CONFIG="${CONFIG}
+    }"
+
+    # Add max_wait_time (sibling of worker block in global frankenphp directive)
+    if [ -n "${FRANKENPHP_MAX_WAIT_TIME}" ]; then
+        CONFIG="${CONFIG}
+    max_wait_time ${FRANKENPHP_MAX_WAIT_TIME}"
+    fi
+
+    export FRANKENPHP_CONFIG="${CONFIG}"
 
     echo "$0: Worker mode enabled"
 fi
