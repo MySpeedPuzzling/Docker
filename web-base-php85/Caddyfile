@@ -44,5 +44,8 @@ import /etc/frankenphp/Caddyfile.d/*.caddyfile
     # PHP handling
     # In non-worker mode: serves static files, falls back to PHP
     # In worker mode: worker config is applied globally via frankenphp block
-    php_server
+    # Split worker pools (match directive) require php_server block syntax
+    php_server {
+        {$PHP_SERVER_CONFIG}
+    }
 }

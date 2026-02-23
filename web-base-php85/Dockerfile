@@ -16,16 +16,15 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
     FRANKENPHP_CONFIG="" \
     FRANKENPHP_MAX_WAIT_TIME="" \
     FRANKENPHP_IMAGE_WORKER_NUM="" \
-    FRANKENPHP_IMAGE_WORKER_MATCH=""
+    FRANKENPHP_IMAGE_WORKER_MATCH="" \
+    PHP_SERVER_CONFIG=""
 
-COPY bin/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY bin/wait-for-it.sh /usr/local/bin/wait-for-it
 
 # Very convenient PHP extensions installer: https://github.com/mlocati/docker-php-extension-installer
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/wait-for-it \
-    && chmod +x /usr/local/bin/docker-entrypoint.sh \
     && mkdir -p /.composer \
     && mkdir -p /usr/tmp \
     && mkdir -p /docker-entrypoint.d \
@@ -93,6 +92,9 @@ COPY Caddyfile /etc/caddy/Caddyfile
 WORKDIR /app
 
 COPY php.ini /usr/local/etc/php/conf.d/99-php-overrides.ini
+
+COPY bin/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8080
 
