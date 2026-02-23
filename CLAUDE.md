@@ -8,25 +8,30 @@ This repository contains Docker base images for the Speedpuzzling.cz project. Im
 
 ## Architecture
 
-Two base image variants:
-- `web-base/` - PHP 8.3 based on NGINX Unit (`unit:php8.3`)
-- `web-base-php84/` - PHP 8.4 based on NGINX Unit (`unit:php8.4`), includes additional tools (Inkscape, librsvg2)
+Single base image variant:
+- `web-base-php85/` - PHP 8.5 based on FrankenPHP (Caddy), includes Inkscape, librsvg2
 
-Each variant contains:
+Contains:
 - `Dockerfile` - Main image definition
 - `php.ini` - PHP configuration overrides
 - `bin/docker-entrypoint.sh` - Container entrypoint script
 - `bin/wait-for-it.sh` - Utility for waiting on services
-- `unit/config.json` - NGINX Unit server configuration
+- `Caddyfile` - Caddy/FrankenPHP server configuration
+- `imagemagick-policy.xml` - ImageMagick security policy
+
+## FrankenPHP Worker Mode
+
+The entrypoint script constructs FrankenPHP config from environment variables:
+
+- **Single pool**: Workers go in the global `frankenphp {}` block via `FRANKENPHP_CONFIG`
+- **Split pools**: When `FRANKENPHP_IMAGE_WORKER_NUM` + `FRANKENPHP_IMAGE_WORKER_MATCH` are set, workers go in the `php_server {}` block via `PHP_SERVER_CONFIG` (required because `match` directive only works inside `php_server`)
+
+Key env vars: `FRANKENPHP_WORKER`, `FRANKENPHP_WORKER_NUM`, `FRANKENPHP_MAX_WAIT_TIME`, `FRANKENPHP_IMAGE_WORKER_NUM`, `FRANKENPHP_IMAGE_WORKER_MATCH`
 
 ## Building Images Locally
 
 ```bash
-# PHP 8.3 variant
-docker build -t web-base ./web-base
-
-# PHP 8.4 variant
-docker build -t web-base-php84 ./web-base-php84
+docker build -t web-base-php85 ./web-base-php85
 ```
 
 ## CI/CD
@@ -36,14 +41,11 @@ GitHub Actions workflows in `.github/workflows/` automatically build and push im
 - Version tags (`v*.*.*`)
 
 Images are published to:
-- `ghcr.io/myspeedpuzzling/web-base`
-- `ghcr.io/myspeedpuzzling/web-base-php84`
-
-The PHP 8.4 variant builds for both `linux/amd64` and `linux/arm64` platforms.
+- `ghcr.io/myspeedpuzzling/web-base-php85`
 
 ## Key Components
 
-- **NGINX Unit**: Application server running on port 8080
+- **FrankenPHP**: Application server on port 8080, worker mode with split pool support
 - **PHP Extensions**: bcmath, intl, pcntl, zip, uuid, pdo_pgsql, opcache, apcu, gd, exif, redis, xdebug, excimer, xsl, imagick
-- **libheif**: Custom build (v1.19.5) with AVIF support for image processing
+- **libheif**: Custom build with AVIF support for image processing
 - **Node.js**: LTS version included for frontend tooling

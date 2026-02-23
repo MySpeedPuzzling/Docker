@@ -17,6 +17,9 @@ PHP 8.5 base image using FrankenPHP (Caddy).
 | `FRANKENPHP_WORKER_NUM` | auto | Number of workers (2x CPUs) |
 | `FRANKENPHP_WATCH` | `""` | Set to `1` for file watching (dev) |
 | `FRANKENPHP_WATCH_PATHS` | `./src/**/*.php ./config/**/*.{yaml,yml} ./templates/**/*.twig` | Watch patterns |
+| `FRANKENPHP_MAX_WAIT_TIME` | `""` | Max queue wait before 504 (e.g. `30s`) |
+| `FRANKENPHP_IMAGE_WORKER_NUM` | `""` | Dedicated worker count for matched paths |
+| `FRANKENPHP_IMAGE_WORKER_MATCH` | `""` | Path pattern for dedicated workers (e.g. `/media/cache/resolve/*`) |
 | `MERCURE_PUBLISHER_JWT_KEY` | `""` | JWT secret for Mercure publishers |
 | `MERCURE_SUBSCRIBER_JWT_KEY` | `""` | JWT secret for Mercure subscribers |
 | `PHP_OPCACHE_VALIDATE_TIMESTAMPS` | `1` | Set `0` for production |
@@ -30,6 +33,20 @@ services:
     image: ghcr.io/myspeedpuzzling/web-base-php85
     environment:
       FRANKENPHP_WORKER: "1"
+      FRANKENPHP_WORKER_NUM: "24"
+      FRANKENPHP_MAX_WAIT_TIME: "30s"
+      PHP_OPCACHE_VALIDATE_TIMESTAMPS: "0"
+
+# Production with split worker pools (isolate slow image processing)
+services:
+  app:
+    image: ghcr.io/myspeedpuzzling/web-base-php85
+    environment:
+      FRANKENPHP_WORKER: "1"
+      FRANKENPHP_WORKER_NUM: "24"
+      FRANKENPHP_IMAGE_WORKER_NUM: "32"
+      FRANKENPHP_IMAGE_WORKER_MATCH: "/media/cache/resolve/*"
+      FRANKENPHP_MAX_WAIT_TIME: "30s"
       PHP_OPCACHE_VALIDATE_TIMESTAMPS: "0"
 
 # Development
@@ -42,6 +59,8 @@ services:
     volumes:
       - ./:/app
 ```
+
+**Split worker pools:** When `FRANKENPHP_IMAGE_WORKER_NUM` and `FRANKENPHP_IMAGE_WORKER_MATCH` are set, requests matching the path pattern are routed to a dedicated worker pool, preventing slow requests (e.g. image processing) from blocking healthchecks and normal page loads.
 
 **Symfony:** 7.4+ has native worker mode support. For older versions: `composer require runtime/frankenphp-symfony` and set `APP_RUNTIME=Runtime\FrankenPhpSymfony\Runtime`
 
