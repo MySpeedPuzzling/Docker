@@ -21,12 +21,9 @@ COPY bin/wait-for-it.sh /usr/local/bin/wait-for-it
 # Very convenient PHP extensions installer: https://github.com/mlocati/docker-php-extension-installer
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
+# Layer 1: System dependencies
 RUN chmod +x /usr/local/bin/wait-for-it \
-    && mkdir -p /.composer \
-    && mkdir -p /usr/tmp \
-    && mkdir -p /docker-entrypoint.d \
-    && mkdir -p /etc/frankenphp/Caddyfile.d \
-    && mkdir -p /data \
+    && mkdir -p /.composer /usr/tmp /docker-entrypoint.d /etc/frankenphp/Caddyfile.d /data \
     && apt-get update && apt-get install -y \
         build-essential \
         cmake \
@@ -52,16 +49,21 @@ RUN chmod +x /usr/local/bin/wait-for-it \
     && apt-get remove -y libheif1 \
     && apt-get update && apt-get install -y \
         inkscape \
-    && cd /usr/local/src && \
-        git clone --branch v1.20.2 https://github.com/strukturag/libheif.git && \
-        cd libheif && \
-        mkdir build && \
-        cd build && \
-        cmake -DENABLE_AVIF=ON .. && \
-        make && make install && \
-        ldconfig && \
-        rm -rf /usr/local/src/libheif \
-    && install-php-extensions \
+    && rm -rf /var/lib/apt/lists/*
+
+# Layer 2: Build libheif with AVIF support
+RUN cd /usr/local/src \
+    && git clone --branch v1.20.2 https://github.com/strukturag/libheif.git \
+    && cd libheif \
+    && mkdir build \
+    && cd build \
+    && cmake -DENABLE_AVIF=ON .. \
+    && make && make install \
+    && ldconfig \
+    && rm -rf /usr/local/src/libheif
+
+# Layer 3: PHP extensions
+RUN install-php-extensions \
         @composer \
         bcmath \
         intl \
@@ -77,8 +79,10 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         excimer \
         xsl \
         imagick \
-        xdebug \
-    && curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+        xdebug
+
+# Layer 4: Node.js and Sentry CLI
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
     && curl -sL https://sentry.io/get-cli/ | bash \
     && apt-get clean && rm -rf /var/lib/apt/lists/*

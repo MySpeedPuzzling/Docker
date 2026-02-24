@@ -38,8 +38,12 @@ import /etc/frankenphp/Caddyfile.d/*.caddyfile
 :8080 {
     root * /app/public
 
-    # Encode responses with zstd/gzip
-    encode zstd gzip
+    # Immutable cache for content-hashed build assets (Webpack Encore)
+    @buildAssets path /build/*
+    header @buildAssets Cache-Control "public, max-age=31536000, immutable"
+
+    # Encode responses with brotli/gzip (brotli preferred, ~20% smaller than gzip)
+    encode br gzip
 
     # PHP handling
     # In non-worker mode: serves static files, falls back to PHP
