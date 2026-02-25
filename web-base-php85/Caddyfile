@@ -42,6 +42,10 @@ import /etc/frankenphp/Caddyfile.d/*.caddyfile
     @buildAssets path /build/*
     header @buildAssets Cache-Control "public, max-age=31536000, immutable"
 
+    # Long cache for static assets that rarely change
+    @staticAssets path /img/* /fonts/*
+    header @staticAssets Cache-Control "public, max-age=2592000"
+
     # Encode responses with brotli/gzip (brotli preferred, ~20% smaller than gzip)
     encode br gzip
 
