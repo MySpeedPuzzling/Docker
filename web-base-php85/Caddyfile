@@ -46,11 +46,20 @@ import /etc/frankenphp/Caddyfile.d/*.caddyfile
     @staticAssets path /img/* /fonts/*
     header @staticAssets Cache-Control "public, max-age=2592000"
 
-    # Encode responses with brotli/gzip (brotli preferred, ~20% smaller than gzip)
+    # Encode dynamic responses with brotli/gzip (brotli preferred, ~20% smaller than gzip)
     encode br gzip
 
-    # PHP handling
-    # In non-worker mode: serves static files, falls back to PHP
-    # In worker mode: worker config is applied globally via frankenphp block
-    php_server
+    # Build assets: serve pre-compressed .br/.gz files if they exist (quality 11).
+    # Zero CPU overhead — files are compressed at max quality during Docker build.
+    # Falls back to on-the-fly compression via encode directive if .br/.gz not found.
+    handle /build/* {
+        file_server {
+            precompressed br gzip
+        }
+    }
+
+    # Everything else: PHP server with static file fallback
+    handle {
+        php_server
+    }
 }
