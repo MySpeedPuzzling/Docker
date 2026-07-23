@@ -83,6 +83,17 @@ import /etc/frankenphp/Caddyfile.d/*.caddyfile
         }
     }
 
+    # Other purely static directories: serve the pre-compressed .br/.gz
+    # siblings the app image ships (previously these fell through to
+    # php_server, which never uses them and re-compressed on the fly).
+    # Nothing dynamic lives under these prefixes; misses 404 here.
+    @staticDirs path /bundles/* /css/* /fonts/* /img/*
+    handle @staticDirs {
+        file_server {
+            precompressed br gzip
+        }
+    }
+
     # Everything else: PHP server with static file fallback
     handle {
         php_server

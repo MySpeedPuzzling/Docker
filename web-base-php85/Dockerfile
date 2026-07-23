@@ -4,7 +4,8 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
     COMPOSER_MEMORY_LIMIT=-1 \
     COMPOSER_HOME="/.composer" \
     PHP_OPCACHE_VALIDATE_TIMESTAMPS=1 \
-    PHP_OPCACHE_MAX_ACCELERATED_FILES=15000 \
+    PHP_OPCACHE_MAX_ACCELERATED_FILES=20000 \
+    PHP_ZEND_ASSERTIONS=1 \
     PHP_OPCACHE_MEMORY_CONSUMPTION=192 \
     PHP_OPCACHE_MAX_WASTED_PERCENTAGE=10 \
     SERVER_NAME=:8080 \
@@ -82,11 +83,30 @@ RUN install-php-extensions \
         imagick \
         xdebug
 
+# Xdebug stays installed but ships disabled: the entrypoint enables it only
+# when XDEBUG_MODE is set (dev compose does). Merely loading the extension
+# costs significant performance, so no derived image can run it by accident.
+RUN mv "$PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini" "$PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini.disabled"
+
 # Layer 4: Node.js and Sentry CLI
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
     && curl -sL https://sentry.io/get-cli/ | bash \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# The imagick install above apt-reinstalls Debian's libheif1 (removed in
+# layer 1), and its file wins SONAME resolution over /usr/local/lib, leaving
+# the custom v1.20.2 AVIF build unused. Divert the distro files out of the
+# linker's search path and assert the ImageMagick heic coder now resolves
+# the custom build.
+RUN set -eux; \
+    mkdir -p /usr/lib/diverted-libheif; \
+    for f in /usr/lib/*-linux-gnu/libheif.so.1*; do \
+        dpkg-divert --divert "/usr/lib/diverted-libheif/$(basename "$f")" --rename "$f"; \
+    done; \
+    ldconfig; \
+    coder="$(find /usr/lib -path '*coders*' -name 'heic.so' | head -1)"; \
+    ldd "$coder" | grep -q '/usr/local/lib/libheif.so.1'
 
 COPY imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
 COPY Caddyfile /etc/caddy/Caddyfile

@@ -2,6 +2,21 @@
 
 set -e
 
+# Enable Xdebug only when explicitly requested. The image ships the ini
+# disabled (docker-php-ext-xdebug.ini.disabled); merely loading the extension
+# costs significant performance, so it must be opt-in via XDEBUG_MODE.
+# In production images that delete both ini files this is a no-op.
+XDEBUG_INI_DIR="${PHP_INI_DIR:-/usr/local/etc/php}/conf.d"
+if [ -n "${XDEBUG_MODE:-}" ] && [ "${XDEBUG_MODE}" != "off" ]; then
+    if [ -f "${XDEBUG_INI_DIR}/docker-php-ext-xdebug.ini.disabled" ]; then
+        mv "${XDEBUG_INI_DIR}/docker-php-ext-xdebug.ini.disabled" "${XDEBUG_INI_DIR}/docker-php-ext-xdebug.ini"
+    fi
+    echo "$0: Xdebug enabled (XDEBUG_MODE=${XDEBUG_MODE})"
+elif [ -f "${XDEBUG_INI_DIR}/docker-php-ext-xdebug.ini" ]; then
+    mv "${XDEBUG_INI_DIR}/docker-php-ext-xdebug.ini" "${XDEBUG_INI_DIR}/docker-php-ext-xdebug.ini.disabled"
+    echo "$0: Xdebug disabled (XDEBUG_MODE not set)"
+fi
+
 # Execute shell scripts from /docker-entrypoint.d/ if present
 # This allows for custom initialization (e.g., Doctrine migrations)
 # Scripts are executed in alphabetical order, so prefix with numbers for ordering:
