@@ -6,7 +6,7 @@ Images are built automatically using Github actions and pushed to Github Contain
 
 PHP 8.5 base image using FrankenPHP (Caddy).
 
-**Features:** FrankenPHP worker mode, Mercure hub, full-duplex HTTP/1.1, PHP extensions (bcmath, intl, pcntl, zip, uuid, pdo_pgsql, opcache, apcu, gd, exif, redis, excimer, xsl, imagick, xdebug), libheif with AVIF, Node.js LTS.
+**Features:** FrankenPHP worker mode, Mercure hub, full-duplex HTTP/1.1, PHP extensions (bcmath, intl, pcntl, zip, uuid, pdo_pgsql, opcache, apcu, gd, exif, redis, excimer, xsl, imagick, xdebug — disabled unless XDEBUG_MODE is set), libheif with AVIF, Node.js LTS.
 
 ### Environment Variables
 

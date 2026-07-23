@@ -46,6 +46,6 @@ Images are published to:
 ## Key Components
 
 - **FrankenPHP**: Application server on port 8080, worker mode
-- **PHP Extensions**: bcmath, intl, pcntl, zip, uuid, pdo_pgsql, opcache, apcu, gd, exif, redis, xdebug, excimer, xsl, imagick
+- **PHP Extensions**: bcmath, intl, pcntl, zip, uuid, pdo_pgsql, opcache, apcu, gd, exif, redis, xdebug (disabled by default, opt-in via XDEBUG_MODE), excimer, xsl, imagick
 - **libheif**: Custom build with AVIF support for image processing
 - **Node.js**: LTS version included for frontend tooling
