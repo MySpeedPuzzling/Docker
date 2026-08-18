@@ -48,6 +48,7 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         pkg-config \
         librsvg2-bin \
         brotli \
+        zstd \
     && apt-get remove -y libheif1 \
     && apt-get update && apt-get install -y \
         inkscape \
