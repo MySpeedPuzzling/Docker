@@ -26,7 +26,9 @@ The entrypoint script constructs FrankenPHP config from environment variables:
 - Workers go in the global `frankenphp {}` block via `FRANKENPHP_CONFIG`
 - File watching is supported for development via `FRANKENPHP_WATCH`
 
-Key env vars: `FRANKENPHP_WORKER`, `FRANKENPHP_WORKER_NUM`, `FRANKENPHP_MAX_WAIT_TIME`
+Key env vars: `FRANKENPHP_WORKER`, `FRANKENPHP_WORKER_NUM`, `FRANKENPHP_MAX_WAIT_TIME`,
+`FRANKENPHP_MAX_REQUESTS` (thread restart after N requests — the guard against native/extension
+memory leaks that the Symfony worker-script restart cannot free; production uses `500`)
 
 ## Building Images Locally
 

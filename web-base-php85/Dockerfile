@@ -15,7 +15,8 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
     FRANKENPHP_WATCH="" \
     FRANKENPHP_WATCH_PATHS="./src/**/*.php ./config/**/*.{yaml,yml} ./templates/**/*.twig" \
     FRANKENPHP_CONFIG="" \
-    FRANKENPHP_MAX_WAIT_TIME=""
+    FRANKENPHP_MAX_WAIT_TIME="" \
+    FRANKENPHP_MAX_REQUESTS=""
 
 COPY bin/wait-for-it.sh /usr/local/bin/wait-for-it
 

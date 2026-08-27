@@ -18,6 +18,7 @@ PHP 8.5 base image using FrankenPHP (Caddy).
 | `FRANKENPHP_WATCH` | `""` | Set to `1` for file watching (dev) |
 | `FRANKENPHP_WATCH_PATHS` | `./src/**/*.php ./config/**/*.{yaml,yml} ./templates/**/*.twig` | Watch patterns |
 | `FRANKENPHP_MAX_WAIT_TIME` | `""` | Max queue wait before 504 (e.g. `30s`) |
+| `FRANKENPHP_MAX_REQUESTS` | `""` | Restart a PHP thread after N requests (leak guard for native/extension memory that outlives the worker-script restart; e.g. `500`) |
 | `MERCURE_PUBLISHER_JWT_KEY` | `""` | JWT secret for Mercure publishers |
 | `MERCURE_SUBSCRIBER_JWT_KEY` | `""` | JWT secret for Mercure subscribers |
 | `PHP_OPCACHE_VALIDATE_TIMESTAMPS` | `1` | Set `0` for production |
@@ -33,6 +34,7 @@ services:
       FRANKENPHP_WORKER: "1"
       FRANKENPHP_WORKER_NUM: "32"
       FRANKENPHP_MAX_WAIT_TIME: "30s"
+      FRANKENPHP_MAX_REQUESTS: "500"
       PHP_OPCACHE_VALIDATE_TIMESTAMPS: "0"
 
 # Development

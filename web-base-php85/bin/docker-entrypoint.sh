@@ -78,6 +78,16 @@ if [ -z "${FRANKENPHP_CONFIG}" ] && [ "${FRANKENPHP_WORKER}" = "1" ]; then
     max_wait_time ${FRANKENPHP_MAX_WAIT_TIME}"
     fi
 
+    # Add max_requests (global frankenphp directive): restart a PHP thread after
+    # N requests. The leak guard for long-running worker processes — native
+    # (extension / C-level) memory that survives the Symfony worker-script
+    # restart (FRANKENPHP_LOOP_MAX) is only released when the THREAD restarts.
+    # Applies to worker and non-worker threads alike. 0/unset = never.
+    if [ -n "${FRANKENPHP_MAX_REQUESTS}" ]; then
+        CONFIG="${CONFIG}
+    max_requests ${FRANKENPHP_MAX_REQUESTS}"
+    fi
+
     export FRANKENPHP_CONFIG="${CONFIG}"
 
     echo "$0: Worker mode enabled"
