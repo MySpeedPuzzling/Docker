@@ -65,7 +65,11 @@ jobs:
                     platforms: ${{ matrix.platform }}
                     labels: ${{ steps.meta.outputs.labels }}
                     tags: ${{ env.REGISTRY_IMAGE }}
-                    outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+                    # zstd layers: smaller, and much cheaper to unpack than gzip - every
+                    # CI job and deploy pulls this image (needs Docker >= 23; GitHub
+                    # runners have 28, lily 29). force-compression re-compresses the
+                    # upstream frankenphp layers too.
+                    outputs: type=image,push-by-digest=true,name-canonical=true,push=true,compression=zstd,compression-level=3,force-compression=true,oci-mediatypes=true
                     cache-from: type=gha,scope=${{ github.workflow }}-${{ env.PLATFORM_PAIR }}
                     cache-to: type=gha,scope=${{ github.workflow }}-${{ env.PLATFORM_PAIR }},mode=max
 
