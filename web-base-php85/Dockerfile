@@ -59,6 +59,8 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 # the image libraries/tools that used to arrive only as dependencies of the
 # -dev packages (libtiffxx6 ... gir1.2-rsvg-2.0), so nothing image-related
 # disappears with the headers.
+# procps (ps, top, free, pgrep) is listed for debugging inside the container -
+# it used to arrive only as a dependency of the tools below.
 # No wkhtmltopdf, inkscape or librsvg2-bin (2026-10): the app never called them
 # - inkscape was only ImageMagick's SVG delegate, and no upload accepts SVG and
 # no stored image is one. Their Qt/GTK stacks and fonts went with them; every
@@ -74,6 +76,7 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         gnupg \
         wget \
         nano \
+        procps \
         imagemagick \
         libmagickwand-6.q16-6 \
         libmagickcore-6.q16-6-extra \
