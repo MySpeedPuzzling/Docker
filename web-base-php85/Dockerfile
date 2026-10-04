@@ -59,6 +59,10 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 # the image libraries/tools that used to arrive only as dependencies of the
 # -dev packages (libtiffxx6 ... gir1.2-rsvg-2.0), so nothing image-related
 # disappears with the headers.
+# No wkhtmltopdf, inkscape or librsvg2-bin (2026-10): the app never called them
+# - inkscape was only ImageMagick's SVG delegate, and no upload accepts SVG and
+# no stored image is one. Their Qt/GTK stacks and fonts went with them; every
+# text the app draws uses the TTF files bundled in the app.
 RUN chmod +x /usr/local/bin/wait-for-it \
     && mkdir -p /.composer /usr/tmp /docker-entrypoint.d /etc/frankenphp/Caddyfile.d /data \
     && apt-get update && apt-get install -y \
@@ -70,8 +74,6 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         gnupg \
         wget \
         nano \
-        wkhtmltopdf \
-        inkscape \
         imagemagick \
         libmagickwand-6.q16-6 \
         libmagickcore-6.q16-6-extra \
@@ -90,7 +92,6 @@ RUN chmod +x /usr/local/bin/wait-for-it \
         libcairo-script-interpreter2 \
         gir1.2-rsvg-2.0 \
         libgdk-pixbuf-2.0-0 \
-        librsvg2-bin \
         brotli \
         zstd \
     && rm -rf /var/lib/apt/lists/*
@@ -130,8 +131,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && curl -sL https://sentry.io/get-cli/ | bash \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Debian's libheif1 comes back as a dependency of ImageMagick (inkscape and
-# imagick pull it in), and its file wins SONAME resolution over /usr/local/lib,
+# Debian's libheif1 comes back as a dependency of ImageMagick (imagick pulls
+# it in), and its file wins SONAME resolution over /usr/local/lib,
 # leaving the custom v1.20.2 AVIF build unused. Divert the distro files out of
 # the linker's search path and assert the ImageMagick heic coder now resolves
 # the custom build.
