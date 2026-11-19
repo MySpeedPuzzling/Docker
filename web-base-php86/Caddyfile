@@ -1,0 +1,101 @@
+{
+    # Disable automatic HTTPS (we're behind a reverse proxy)
+    auto_https off
+
+    # Global Caddy runtime logs (startup, errors, internal events)
+    log {
+        output stdout
+        format console
+    }
+
+    # Server configuration
+    servers {
+        # Trust private IP ranges for X-Forwarded-* headers (Traefik, etc.)
+        # Required for proper HTTPS detection behind reverse proxies
+        trusted_proxies static private_ranges
+
+        # Allow large request headers (128KB)
+        max_header_size 128kb
+
+        # Enable full-duplex for HTTP/1.1 connections
+        # Required for SSE, streaming responses, etc.
+        enable_full_duplex
+    }
+
+    # FrankenPHP worker configuration (injected via FRANKENPHP_CONFIG env var)
+    # Example: FRANKENPHP_CONFIG="worker { file /app/public/index.php num 4 }"
+    frankenphp {
+        {$FRANKENPHP_CONFIG}
+    }
+
+    # Additional global options can be injected via CADDY_GLOBAL_OPTIONS
+    {$CADDY_GLOBAL_OPTIONS}
+}
+
+# Import user-provided Caddyfile snippets (optional)
+import /etc/frankenphp/Caddyfile.d/*.caddyfile
+
+:8080 {
+    root * /app/public
+
+    # Immutable cache for content-hashed build assets (Webpack Encore).
+    # The `file` matcher limits the header to assets that exist on disk:
+    # 404 is a cacheable-by-default HTTP status, so without it a deploy-window
+    # 404 would carry the year-long public header and get pinned by browser
+    # and CDN caches long after the asset exists.
+    @buildAssets {
+        path /build/*
+        file
+    }
+    header @buildAssets Cache-Control "public, max-age=31536000, immutable"
+
+    # A missing build asset must never be cached anywhere.
+    @buildMiss {
+        path /build/*
+        not file
+    }
+    header @buildMiss Cache-Control "no-store"
+
+    # Long cache for static assets that rarely change (existing files only,
+    # same 404 reasoning as above)
+    @staticAssets {
+        path /img/* /fonts/*
+        file
+    }
+    header @staticAssets Cache-Control "public, max-age=2592000"
+
+    # The service worker must always be revalidated: browsers bypass their own
+    # HTTP cache when checking for service worker updates, but CDNs do not -
+    # without an explicit header an edge proxy caches this like any other .js
+    # and delays CACHE_VERSION rollouts. ETag makes revalidation a cheap 304.
+    @serviceWorker path /service-worker.js
+    header @serviceWorker Cache-Control "no-cache"
+
+    # Encode dynamic responses with brotli/gzip (brotli preferred, ~20% smaller than gzip)
+    encode br gzip
+
+    # Build assets: serve pre-compressed .br/.gz files if they exist (quality 11).
+    # Zero CPU overhead — files are compressed at max quality during Docker build.
+    # Falls back to on-the-fly compression via encode directive if .br/.gz not found.
+    handle /build/* {
+        file_server {
+            precompressed br gzip
+        }
+    }
+
+    # Other purely static directories: serve the pre-compressed .br/.gz
+    # siblings the app image ships (previously these fell through to
+    # php_server, which never uses them and re-compressed on the fly).
+    # Nothing dynamic lives under these prefixes; misses 404 here.
+    @staticDirs path /bundles/* /css/* /fonts/* /img/*
+    handle @staticDirs {
+        file_server {
+            precompressed br gzip
+        }
+    }
+
+    # Everything else: PHP server with static file fallback
+    handle {
+        php_server
+    }
+}
